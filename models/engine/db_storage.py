@@ -77,15 +77,15 @@ class DBStorage:
 
     def get(self, cls, id):
         """method to retrieve one object"""
-        if cls and id:
-            tempo = cls, __name__ + "." + id
-            count = self.all(cls)
-            for key in count:
-                if key == tempo:
-                    return count[key]
-                else:
-                    return None
+        key = "{}.{}".format(cls.__name__, id)
+        return self.__session.query(cls).get(key)
 
     def count(self, cls=None):
-        """class (optional)"""
-        return (len(self.all(cls)))
+        """Count the number of objects in storage"""
+        if cls:
+            objects = self.__session.query(cls).all()
+        else:
+            objects = []
+            for cls in self.__classes:
+                objects.extend(self.__session.query(cls).all())
+                return len(objects)
